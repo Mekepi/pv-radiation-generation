@@ -13,22 +13,22 @@ states:dict[str, str] = {
     "11": "RO", "14": "RR", "42": "SC", "35": "SP", "28": "SE", "17": "TO"
 }
 
-def write_cities(geocode:str, lines:list[str], header:str, pgr_path:Path) -> None:
+def write_cities(geocode:str, lines:list[str], header:str, data_folder:Path) -> None:
     state:str = states[geocode[:2]]
     
-    makedirs("%s\\gd-cities\\%s"%(pgr_path, state), exist_ok = True)
+    makedirs("%s\\ventures\\%s"%(data_folder, state), exist_ok = True)
 
-    with open("%s\\gd-cities\\%s\\[%s]empreendimentos-gd.csv"%(pgr_path, state, geocode), 'w', 10_485_760, encoding='ansi') as fout:
+    with open("%s\\ventures\\%s\\[%s]dg-venture.csv"%(data_folder, state, geocode), 'w', 1024*1024*64, encoding='utf-8') as fout:
         fout.write(header)
         fout.writelines(lines)
 
 def filter_per_city(file_path:Path, geocode_column:int) -> None:
     t0:float = perf_counter()
-    pgr_path:Path = Path(dirname(abspath(__file__)))
+    data_folder:Path = Path('%s\\data'%(Path(dirname(abspath(__file__))).parent))
     
     cities:defaultdict[str, list[str]] = defaultdict(list[str])
 
-    with open("%s\\%s"%(dirname(abspath(__file__)), file_path), 'r', encoding='ansi') as fin:
+    with open("%s\\%s"%(data_folder, file_path), 'r', encoding='utf-8') as fin:
         header:str = fin.readline()
         #print(*[(i, header.split('";"')[i]) for i in range(len(header.split('";"')))])
         
@@ -37,7 +37,7 @@ def filter_per_city(file_path:Path, geocode_column:int) -> None:
             cities[geocode].append(line)
 
     with Pool(cpu_count()) as p:
-        p.starmap(write_cities, [[key, cities[key], header, pgr_path] for key in cities.keys()])
+        p.starmap(write_cities, [[key, cities[key], header, data_folder] for key in cities.keys()])
     
     print('execution time: %.2f'%(perf_counter()-t0))
 
