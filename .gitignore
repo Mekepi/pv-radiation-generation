@@ -1,10 +1,6 @@
-data/timeseries/*
+data/*
 !data/timeseries/.gitkeep
-
-data/ventures/*
 !data/ventures/.gitkeep
-
-data/outputs/plot/*
 !data/outputs/plot/.gitkeep
 
 # mypy
