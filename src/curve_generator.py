@@ -65,21 +65,28 @@ def avarage_month_radiation_generation(timeseries:list[str], state:str, geocode:
 
     import matplotlib.pyplot as plt
     from matplotlib import use
+    from matplotlib.axes import Axes
     use("Agg")
 
+    ax1:Axes
     fig, ax1 = plt.subplots()
 
-    ax2 = ax1.twinx()  # instantiate a second Axes that shares the same x-axis
+    ax2:Axes = ax1.twinx() #type: ignore
     
     ax2.plot(range(24), [hourly_radiation[i]/1000 for i in range(24)], label="Irradiance Curve", color="black") #radiation
-    ax1.bar(range(24), [hourly_generation[i]/1000 for i in range(24)], label="Method 1", color="#DB5C1F") # 1sr formula
+    ax1.bar(range(24), [hourly_generation[i]/1000 for i in range(24)], label="Method 1", color="#24B351") # 1sr formula
     ax1.bar(range(24), [hourly_radiation[i]*correction_factor2/1000 for i in range(24)], label="Method 2", color="#1F2792", alpha=0.70) #2nd formula
     plt.title(ceg)
     plt.suptitle("PV Yield at (%f,%f), [%s]\n\nArea: %.0f m²    Panels: %i    Power: %.0f kW"%(orig_coord[1], orig_coord[0], geocode, area, panels, power/1000))
     ax1.set_xlabel("Time [Hour]\n\nRadiation Energy: %.2f kWh\n\nMethod 1 - Factor: %.3f    Produced Energy: %.2f kWh    Loss: %.2f %%\n\nMethod 2 - Factor: %.3f    Produced Energy: %.2f kWh    Loss: %.2f %%"%(radiation_energy, correction_factor1, generated_energy1, loss1*100, correction_factor2, generated_energy2, loss2*100))
-    ax1.set_ylabel("Energy [kWh]", color='#DB5C1F')
+    ax1.set_ylabel("Energy [kWh]", color='#24B351')
     ax2.set_ylabel("Irradiance [kWh/m²]", color='black')
-    ax1.set_ylim(ax2.set_ylim())
+    
+    if ax1.set_ylim()[1] > ax2.set_ylim()[1]:
+        ax2.set_ylim(ax1.set_ylim())
+    else:
+        ax1.set_ylim(ax2.set_ylim())
+    
     ax1.legend(loc=2)
     ax2.legend(loc=1)
 
@@ -89,7 +96,7 @@ def avarage_month_radiation_generation(timeseries:list[str], state:str, geocode:
     plt.close()
 
 
-def average_year_radiation(timeseries:list[str], ceg:str, time_correction:int, city_plot_folder:Path):
+def average_year_radiation(timeseries:list[str], orig_coord:list[float, float], geocode:str, ceg:str, time_correction:int, city_plot_folder:Path):
     year:defaultdict[str, list[float]] = defaultdict(list[float])
     for line in timeseries:
         year[line.split(',')[0][4:8]].append(sum([float(j) for j in line.split(',')[1:4]]))
@@ -111,7 +118,11 @@ def average_year_radiation(timeseries:list[str], ceg:str, time_correction:int, c
     #ax.plot_surface(z)
     ax.plot_surface(X.T, Y.T, z, cmap='viridis')
     ax.view_init(20, -50, 0)
-    #plt.show()
+    ax.set_xlabel('Day of the Year [Day]')
+    ax.set_ylabel('Hour of the Day [Hour]')
+    ax.set_zlabel('Solar Irradiance [kW/m²]')
+    ax.set_title("Hourly Solar Irradiance Across the Year\n\n%s\n(%f,%f) [%s]"%(ceg, orig_coord[1], orig_coord[0], geocode))
+    plt.tight_layout()
     plt.savefig("%s\\%s-3D-year-radiation.png"%(city_plot_folder, ceg), backend='Agg', dpi=200)
     plt.close()
     #22, -33, 0
@@ -142,7 +153,7 @@ def curve_gen(data:list[str], orig_coord:list[float], coord:np.ndarray, loss:flo
     city_plot_folder:Path = Path("%s\\outputs\\plot\\%s\\[%s]"%(Path(dirname(abspath(__file__))).parent, state, geocode))
     makedirs("%s"%(city_plot_folder), exist_ok=True)
     
-    average_year_radiation(lines, ceg, time_correction, city_plot_folder)
+    average_year_radiation(lines, orig_coord, geocode, ceg, time_correction, city_plot_folder)
     avarage_month_radiation_generation(lines, state, geocode, ceg, orig_coord, data, time_correction, city_plot_folder)
 
 def gds_generation_curve(sts:list[str] = [], geocodes:list[str] = [], loss:float=0.0) -> None:
@@ -203,7 +214,7 @@ def gds_generation_curve(sts:list[str] = [], geocodes:list[str] = [], loss:float
                 """ cts = np.concatenate((city_ventures_coords, city_coords[idxs], np.reshape(distances, [len(distances),1])), 1)
                 print(cts, sep="\n") """
                 
-                p.starmap(curve_gen, [[line[1:-2].split('";"'), orig_coord, closest_timeseries, loss] for (line, orig_coord, closest_timeseries) in zip(lines, city_ventures_coords, city_coords[idxs])])
+                p.starmap(curve_gen, [[line[1:-2].split('";"'), orig_coord, closest_timeseries, loss] for (line, orig_coord, closest_timeseries) in zip(lines[:5], city_ventures_coords, city_coords[idxs])])
 
     print(perf_counter()-t0)
 
