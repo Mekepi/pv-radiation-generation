@@ -3,6 +3,8 @@ data/*
 !data/ventures/.gitkeep
 !data/outputs/plot/.gitkeep
 
+Too Far Coords
+
 # mypy
 .mypy_cache/
 .dmypy.json
