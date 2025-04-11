@@ -29,6 +29,7 @@ def average_year_radiation(timeseries:list[str]):
     y:np.ndarray = np.array(list(range(24)))
     #z:np.ndarray = np.array()
     z = np.asarray([[sum([year[day][j] for j in range(i, len(year[day]), 24)])/(len(year[day])/24) for i in range(24)] for day in sorted(year.keys())])
+    z = np.concatenate([z[:, 3:], z[:, :3]], axis=1)
     #print(year['0101'])
     print(x.shape, y.shape, z.shape)
     import matplotlib.pyplot as plt
