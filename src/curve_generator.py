@@ -96,7 +96,7 @@ def avarage_month_radiation_generation(timeseries:list[str], state:str, geocode:
     plt.close()
 
 
-def average_year_radiation(timeseries:list[str], orig_coord:list[float, float], geocode:str, ceg:str, time_correction:int, city_plot_folder:Path):
+def average_year_radiation(timeseries:list[str], orig_coord:list[float], geocode:str, ceg:str, time_correction:int, city_plot_folder:Path):
     year:defaultdict[str, list[float]] = defaultdict(list[float])
     for line in timeseries:
         year[line.split(',')[0][4:8]].append(sum([float(j) for j in line.split(',')[1:4]]))
@@ -115,13 +115,13 @@ def average_year_radiation(timeseries:list[str], orig_coord:list[float, float], 
 
     ax:Axes3D = plt.axes(projection='3d')
     X, Y = np.meshgrid(x,y)
-    #ax.plot_surface(z)
+    
     ax.plot_surface(X.T, Y.T, z, cmap='viridis')
     ax.view_init(20, -50, 0)
     ax.set_xlabel('Day of the Year [Day]')
     ax.set_ylabel('Hour of the Day [Hour]')
     ax.set_zlabel('Solar Irradiance [kW/m²]')
-    ax.set_title("Hourly Solar Irradiance Across the Year\n\n%s\n(%f,%f) [%s]"%(ceg, orig_coord[1], orig_coord[0], geocode))
+    ax.set_title("Hourly Solar Radiation Across the Year\n\n%s\n(%f,%f) [%s]"%(ceg, orig_coord[1], orig_coord[0], geocode))
     plt.tight_layout()
     plt.savefig("%s\\%s-3D-year-radiation.png"%(city_plot_folder, ceg), backend='Agg', dpi=200)
     plt.close()
@@ -214,12 +214,12 @@ def gds_generation_curve(sts:list[str] = [], geocodes:list[str] = [], loss:float
                 """ cts = np.concatenate((city_ventures_coords, city_coords[idxs], np.reshape(distances, [len(distances),1])), 1)
                 print(cts, sep="\n") """
                 
-                p.starmap(curve_gen, [[line[1:-2].split('";"'), orig_coord, closest_timeseries, loss] for (line, orig_coord, closest_timeseries) in zip(lines[:5], city_ventures_coords, city_coords[idxs])])
+                p.starmap(curve_gen, [[line[1:-2].split('";"'), orig_coord, closest_timeseries, loss] for (line, orig_coord, closest_timeseries) in zip(lines, city_ventures_coords, city_coords[idxs])])
 
     print(perf_counter()-t0)
 
 if __name__ == "__main__":
-    gds_generation_curve(geocodes=['3501608'])
+    gds_generation_curve(geocodes=['3550308'])
 
 # (0, '"CodEmpreendimento') (1, 'CodMunicipioIbge') (2, 'NumCoordNEmpreendimento') (3, 'NumCoordEEmpreendimento')
 # (4, 'MdaPotenciaInstaladaKW') (5, 'MdaAreaArranjo') (6, 'QtdModulos') (7, 'MdaPotenciaModulos') (8, 'NomModeloModulo')
