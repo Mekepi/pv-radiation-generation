@@ -1,8 +1,9 @@
 data/*
 !data/timeseries/.gitkeep
+!data/timeseries_coords/.gitkeep
 !data/ventures/.gitkeep
 
-outputs/plot/*
+outputs/*
 !outputs/plot/.gitkeep
 
 Too Far Coords
