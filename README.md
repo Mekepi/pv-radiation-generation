@@ -1,7 +1,7 @@
 # PV Radiation vs Generation Analyzer  
 <div align="center" style="display: flex; justify-content: space-between;">
-  <img src="2d-sample.png" width="45%" alt="Radiation vs Generation Curve">
-  <img src="3d-sample.png" width="45%" alt="Average Solar Irradiance">
+  <img src="sample-2d.png" width="45%" alt="Radiation vs Generation Curve">
+  <img src="sample-3d.png" width="45%" alt="Average Solar Irradiance">
 </div
 
 *[Hourly solar radiation vs. generation capacity | Hourly solar radiation across the year] - Sample photovoltaic venture (São Paulo, Brazil)*  
