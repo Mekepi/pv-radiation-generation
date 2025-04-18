@@ -67,8 +67,15 @@ def average_day_radiation_plot(month:np.ndarray, venture_coord:list[float], data
     ax2.plot(range(24), hourly_radiation, label="Irradiance Curve", color="black") #radiation
     ax1.bar(range(24), hourly_generation[:,0], label="Method 1", color="#24B351") # 1sr formula
     #ax1.bar(range(24), hourly_radiation*correction_factor2, label="Method 2", color="#1F2792", alpha=0.70) #2nd formula
-    plt.title("%s\n%s"%(ceg, plot_type))
-    plt.suptitle("PV Yield at (%f,%f), [%s]\n\nArea: %.0f m²    Panels: %i    Power: %.0f kW"%(venture_coord[1], venture_coord[0], geocode, area, panels, power/1000))
+    plt.title("Average Day PV Yield\n"+
+              "%s\n\n"%(plot_type)+
+              
+              "%s\n"%(ceg)+
+              "(%.6f,%.6f) [%s]\n\n"%(venture_coord[1], venture_coord[0], geocode)+
+
+              "Area: %.0f m²    Panels: %i    Power: %.0f kW"%(area, panels, power/1000)
+              )
+    #plt.suptitle("PV Yield at (%f,%f), [%s]\n\nArea: %.0f m²    Panels: %i    Power: %.0f kW"%(venture_coord[1], venture_coord[0], geocode, area, panels, power/1000))
     ax1.set_xlabel("Time [Hour]\n\nRadiation Energy: %.2f kWh\n\nMethod 1 - Factor: %.3f    Produced Energy: %.2f kWh    Loss: %.2f %%"%(radiation_energy, correction_factor1, generated_energy1, loss1*100))
     ax1.set_ylabel("Energy [kWh]", color='#24B351')
     ax2.set_ylabel("Irradiance [kWh/m²]", color='black')
@@ -103,7 +110,7 @@ def year_radiation_plot(Z:np.ndarray, venture_coord:list[float], geocode:str, ce
     ax.set_xlabel('Day of the Year [Day]')
     ax.set_ylabel('Hour of the Day [Hour]')
     ax.set_zlabel('Solar Irradiance [kW/m²]')
-    ax.set_title("Hourly Solar Radiation Across the Year\n%s\n\n%s\n(%f,%f) [%s]"%(plot_type, ceg, venture_coord[1], venture_coord[0], geocode))
+    ax.set_title("Hourly Solar Radiation Across the Year\n%s\n\n%s\n(%.6f,%.6f) [%s]"%(plot_type, ceg, venture_coord[1], venture_coord[0], geocode))
     plt.tight_layout()
     plt.savefig("%s\\%s-3D-year-radiation-%s.png"%(city_plot_folder, ceg, plot_type), backend='Agg', dpi=200)
     plt.close()
@@ -290,7 +297,7 @@ def gds_generation_curve(sts:list[str] = [], geocodes:list[str] = []) -> None:
     print(perf_counter()-t0)
 
 if __name__ == "__main__":
-    gds_generation_curve(geocodes=['3501608'])
+    gds_generation_curve(geocodes=['3550308'])
 
 # (0, '"CodEmpreendimento') (1, 'CodMunicipioIbge') (2, 'NumCoordNEmpreendimento') (3, 'NumCoordEEmpreendimento')
 # (4, 'MdaPotenciaInstaladaKW') (5, 'MdaAreaArranjo') (6, 'QtdModulos') (7, 'MdaPotenciaModulos') (8, 'NomModeloModulo')
